@@ -5,7 +5,7 @@ This ARM template is inspired by Taylor NEWILL template:
 
 # Simple deployment of a VM Scale Set of Linux VMs with a jumpbox
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkpischke%2Frawcluster%2Fazuredeploy.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkpischke%2Frawcluster%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
