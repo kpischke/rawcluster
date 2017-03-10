@@ -1,96 +1,84 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "resourceLocation": {
-      "type": "string",
-      "allowedValues": [
-        "East US",
-        "West US",
-        "South Central US",
-        "North Europe",
-        "West Europe"
-      ],
-      "metadata": {
-        "description": "Azure region where all resources will be deployed. This is distinct from resource group location."
-      }
-    },
-    "computeNodeImage": {
-      "type": "string",
-      "defaultValue": "CentOS_6.5_HPC",
-      "allowedValues": [
-        "CentOS_6.5_HPC",
-        "CentOS_7.1_HPC",
-        "SLES12_SP1_HPC"
-      ],
-       "metadata": {
-	 	"Description": "Chose the Linux distribution for master & compute VMs"
-       }
-    },
-    "vmSku": {
-      "type": "string",
-      "defaultValue": "Standard_A8",
-      "allowedValues": [
-        "Basic_A4",
-        "Standard_A8",
-        "Standard_A9",
-        "Standard_A10",
-        "Standard_A11",
-	"Standard_H16r",
-	"Standard_H16mr"
-      ],
-      "metadata": {
-        "description": "Which instance would you like to deploy to?"
-      }
-    },
-    "vmssName":{
-      "type":"string",
-      "metadata":{
-        "description":"String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended."
-      },
-      "maxLength": 61
-    },
-    "instanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of VM instances (100 or less)."
-      },
-      "maxValue": 100
-    },
-    "adminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Admin username on all VMs."
-      }
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Admin password on all VMs."
-      }
-    }
+	  "resourceLocation": {
+		  "defaultValue": "West Europe",
+		  "type": "string",
+		  "allowedValues": [
+			  "East US",
+			  "South Central US",
+			  "North Europe",
+			  "West Europe"
+		  ],
+		  "metadata": {
+			  "description": "Azure region where all resources will be deployed. This is distinct from resource group location."
+		  }
+	  },
+	  "computeNodeImage": {
+		  "type": "string",
+		  "defaultValue": "CentOS_6.5_HPC",
+		  "allowedValues": [
+			  "CentOS_6.5_HPC",
+			  "CentOS_7.1_HPC",
+			  "SLES12_SP1_HPC"
+		  ],
+		  "metadata": {
+			  "Description": "Chose the Linux distribution for master & compute VMs"
+		  }
+	  },
+	  "vmSku": {
+		  "type": "string",
+		  "defaultValue": "Standard_A8",
+		  "allowedValues": [
+			  "Basic_A4",
+			  "Standard_A8",
+			  "Standard_A9",
+			  "Standard_A10",
+			  "Standard_A11",
+			  "Standard_H16r",
+			  "Standard_H16mr"
+		  ],
+		  "metadata": {
+			  "description": "Which instance would you like to deploy to?"
+		  }
+	  },
+	  "vmssName":{
+		  "type":"string",
+		  "metadata":{
+			  "description":"String used as a base for naming resources. Must be 3-61 characters in length and globally unique across Azure. A hash is prepended to this string for some resources, and resource-specific information is appended."
+		  },
+		  "maxLength": 61
+	  },
+	  "instanceCount": {
+		  "type": "int",
+		  "metadata": {
+			  "description": "Number of VM instances (100 or less)."
+		  },
+	          "defaultValue": 2,	  
+		  "maxValue": 100
+	  },
+	  "adminUsername": {
+		  "type": "string",
+		  "metadata": {
+			  "description": "Admin username on all VMs."
+		  }
+	  },
+	  "adminPassword": {
+		  "type": "securestring",
+		  "metadata": {
+			  "description": "Admin password on all VMs."
+		  }
+	  }
   },
   "variables": {
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmssName'))]",
     "jumpBoxName": "[concat(variables('namingInfix'), 'jbox')]",
-    "jumpBoxSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'jumpboxsa')), 'jb')]",
     "jumpBoxOSDiskName": "[concat(variables('jumpBoxName'), 'osdisk')]",
     "jumpBoxVHDContainerName": "[concat(variables('jumpBoxName'), 'vhd')]",
     "jumpBoxIPConfigName": "[concat(variables('jumpBoxName'), 'ipconfig')]",
     "jumpBoxNicName": "[concat(variables('jumpBoxName'), 'nic')]",
-    "storageAccountType": "Standard_LRS",
-    "newStorageAccountSuffix": "[concat(variables('namingInfix'), 'sa')]",
-    "uniqueStringArray": [
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '4')))]"
-    ],
-    "saCount": "[length(variables('uniqueStringArray'))]",
-    "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
-    "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/24",
     "virtualNetworkName": "[concat(variables('namingInfix'), 'vnet')]",
@@ -101,7 +89,7 @@
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
-    "scriptUrl": "https://raw.githubusercontent.com/kpischke/rawcluster/master/",
+    "scriptUrl": "https://raw.githubusercontent.com/thovarMS/5clickTemplates/master/RawCluster/",
     "cnSetupScript": "cn-setup.sh",
     "hnSetupScript": "hn-setup.sh",
     "computeNodeImages": {
@@ -157,17 +145,7 @@
           }
         ]
       }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('jumpBoxSAName')]",
-      "location": "[parameters('resourceLocation')]",
-      "apiVersion": "[variables('storageApiVersion')]",
-      "properties": {
-        "accountType": "[variables('storageAccountType')]"
-      }
-    },
-    {
+    },     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
       "location": "[parameters('resourceLocation')]",
@@ -211,7 +189,6 @@
       "location": "[parameters('resourceLocation')]",
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('jumpBoxSAName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('jumpBoxNicName'))]"
       ],
       "properties": {
@@ -226,12 +203,8 @@
         "storageProfile": {
 	  "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]",
           "osDisk": {
-            "name": "[variables('jumpBoxOSDiskName')]",
-            "vhd": {
-              "uri": "[concat('http://',variables('jumpBoxSAName'),'.blob.core.windows.net/',variables('jumpBoxVHDContainerName'),'/',variables('jumpBoxOSDiskName'),'.vhd')]"
-            },
-            "caching": "ReadWrite",
-            "createOption": "FromImage"
+		  "caching": "ReadWrite",
+		  "createOption": "FromImage"
           }
         },
         "networkProfile": {
@@ -241,12 +214,6 @@
             }
           ]
         },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": "true",
-            "storageUri": "[concat('http://',variables('jumpBoxSAName'),'.blob.core.windows.net')]"
-          }
-        }
       },
       "resources": [
         {
